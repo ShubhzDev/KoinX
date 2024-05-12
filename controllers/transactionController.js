@@ -5,11 +5,10 @@ const etherscanService = require("../services/etherscanService");
 exports.getTransactions = async (req, res) => {
   const address = req.params.address;
   const response = await etherscanService.getTransactions(address);
+  let newTransactions = [];
+  let addressDatabase;
 
   try {
-    let newTransactions = [];
-    let addressDatabase;
-
     addressDatabase = await Address.findOne({ address: address }).populate(
       "transactions"
     );
@@ -26,33 +25,48 @@ exports.getTransactions = async (req, res) => {
           (transaction) => !existingTransactions.includes(transaction.hash)
         );
 
-        missingTransactions.forEach(async(transaction) => {
-          console.log("missing");
-          const newTransaction = new Transaction({
-            ...transaction,
-          });
-          const savedTransaction = await newTransaction.save();
-          addressDatabase.transactions.push(savedTransaction._id);
-        });    
+        if (
+          Array.isArray(missingTransactions) &&
+          missingTransactions.length > 0
+        ) {
+          for (const transaction of missingTransactions) {
+            const newTransaction = new Transaction({
+              ...transaction,
+            });
+            const savedTransaction = await newTransaction.save();
+            addressDatabase.transactions.push(savedTransaction._id);
+            await addressDatabase.save();
+          }
 
-        await addressDatabase.save();
+          const updatedTransactions = await Address.findOne({
+            address: address,
+          }).populate("transactions");
 
-        const updatedtransactions = addressDatabase.transactions;
-        res.status(200).send({ transactions: updatedtransactions });
+          res
+            .status(200)
+            .send({ transactions: updatedTransactions.transactions });
 
+        } else {
+          res.status(200).send({ transactions: transactions });
+        }
       }
     } else {
+
+      console.log("Address not present in database!!");
+
+      // console.log("response.data.result "+response.data.result);
       if (response.data && response.data.result) {
         newTransactions.push(...response.data.result);
 
+        let transactionIds = [];
         for (const transaction of newTransactions) {
+          // console.log("adding transaction "+transaction);
+
           const newTransaction = new Transaction({ ...transaction });
           const savedTransaction = await newTransaction.save();
-          // console.log("Saved Transaction ID: " + savedTransaction._id);
+          transactionIds.push(savedTransaction._id);
         }
-      
-        const transactionIds = newTransactions.map(transaction => transaction._id);
-      
+
         const newAddress = new Address({
           address: address,
           transactions: transactionIds,
@@ -61,7 +75,7 @@ exports.getTransactions = async (req, res) => {
         await newAddress.save();
 
         res.status(200).send({
-          transactions : newTransactions,
+          transactions: newTransactions,
         });
       }
     }

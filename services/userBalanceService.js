@@ -4,7 +4,7 @@ const coingeckoService = require("./coingeckoService");
 exports.calculateUserBalance = async (address, transactions) => {
   let balance = ethers.BigNumber.from(0);
 
-  transactions.forEach((transaction) => {
+  for (const transaction of transactions) {
     if (transaction.to === address) {
       balance = balance.add(ethers.utils.parseUnits(transaction.value, "wei"));
     } else if (transaction.from === address) {
@@ -14,7 +14,7 @@ exports.calculateUserBalance = async (address, transactions) => {
       
       balance = balance.sub(ethers.utils.parseUnits(transaction.value, "wei")).sub(gasFee);
     }
-  });
+  }
 
   return ethers.utils.formatEther(balance);
 };
