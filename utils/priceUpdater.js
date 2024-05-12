@@ -1,13 +1,18 @@
 const EthereumPrice = require("../models/ethereumPriceModel");
 const coingeckoService = require("../services/coingeckoService");
 
-exports.getEthereumPrice = async (req, res) => {
+const updateEthereumPrice = async () => {
   try {
     const price = await coingeckoService.getEthereumPrice();
     const newPrice = new EthereumPrice({ priceInr: price });
     await newPrice.save();
-    res.status(200).send({ price });
+    console.log("Ethereum price updated successfully!");
   } catch (err) {
-    res.status(500).send({ message: "Failed to retrieve Ethereum price" });
+    console.error("Failed to update Ethereum price:", err);
   }
 };
+
+const interval = 10 * 60 * 1000; // 10 minutes
+setInterval(updateEthereumPrice, interval);
+
+module.exports = { updateEthereumPrice };

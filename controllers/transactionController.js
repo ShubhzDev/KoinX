@@ -26,33 +26,33 @@ exports.getTransactions = async (req, res) => {
           (transaction) => !existingTransactions.includes(transaction.hash)
         );
 
-        missingTransactions.forEach((transaction) => {
+        missingTransactions.forEach(async(transaction) => {
+          console.log("missing");
           const newTransaction = new Transaction({
             ...transaction,
           });
-          newTransaction.save();
-        });
+          const savedTransaction = await newTransaction.save();
+          addressDatabase.transactions.push(savedTransaction._id);
+        });    
 
-        addressDatabase = await Address.findOne({
-          address: address,
-        }).populate("transactions");
+        await addressDatabase.save();
 
         const updatedtransactions = addressDatabase.transactions;
-        res.status(200).send({ updatedtransactions });
+        res.status(200).send({ transactions: updatedtransactions });
+
       }
     } else {
       if (response.data && response.data.result) {
         newTransactions.push(...response.data.result);
 
-        const transactionIds = await Promise.all(
-          newTransactions.map(async (transaction) => {
-            const newTransaction = new Transaction({ ...transaction });
-            const savedTransaction = await newTransaction.save();
-            console.log("Saved Transaction ID: " + savedTransaction._id);
-            return savedTransaction._id;
-          })
-        );
-
+        for (const transaction of newTransactions) {
+          const newTransaction = new Transaction({ ...transaction });
+          const savedTransaction = await newTransaction.save();
+          // console.log("Saved Transaction ID: " + savedTransaction._id);
+        }
+      
+        const transactionIds = newTransactions.map(transaction => transaction._id);
+      
         const newAddress = new Address({
           address: address,
           transactions: transactionIds,
@@ -61,7 +61,7 @@ exports.getTransactions = async (req, res) => {
         await newAddress.save();
 
         res.status(200).send({
-          newTransactions,
+          transactions : newTransactions,
         });
       }
     }
