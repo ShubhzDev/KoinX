@@ -1,3 +1,7 @@
+## Backened is Deployed on Vercel:-
+https://koin-x-mauve.vercel.app/api/stats/bitcoin
+https://koin-x-mauve.vercel.app/api/deviation/bitcoin
+
 ## Features
 1. Retrieves the current stats of Ethereum,Matic and Bitcoin from the CoinGecko API and updates it in the database every 2 hours.
 2. Provides a `GET` API endpoint which fetches and returns current stats(usd,usd_market_cap and usd_24h_change) of given Coin.
@@ -24,3 +28,4 @@
 
 - `GET /api/stats/coin`: Fetches and returns current stats(usd,usd_market_cap and usd_24h_change) of given Coin.
 - `GET /api/deviation/coin`: Calculates and returns deviation of given Coin.
+
