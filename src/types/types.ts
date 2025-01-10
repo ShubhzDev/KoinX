@@ -6,3 +6,7 @@ export interface ICryptoPrice extends Document {
   usdMarketCap: number,
   usd24hChange: number,
 }
+
+export interface IFailure {
+  message: string;
+}

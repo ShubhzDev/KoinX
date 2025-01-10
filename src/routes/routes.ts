@@ -4,7 +4,7 @@ import getStats from '../controllers/statsController';
 
 const router = express.Router();
 
-router.post('/stats/:coin', getStats);
+router.get('/stats/:coin', getStats);
 router.get('/deviation/:coin', getDeviation);
 
 export default router;

@@ -1,4 +1,4 @@
-import { getPrices } from "./databaseService";
+import { getPrices } from "./deviationCalculator";
 
 export const calculateDeviation = async (coin: string): Promise<number> => {
   const prices = (await getPrices(coin)).filter(

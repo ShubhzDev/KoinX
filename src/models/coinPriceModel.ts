@@ -8,4 +8,4 @@ export const coinPriceModel = new Schema({
   usd24hChange: Number,
 });
 
- export const coinPrice = mongoose.model<ICryptoPrice>('BitcoinPrice', coinPriceModel);
+ export const coinPrice = mongoose.model<ICryptoPrice>('coinPrice', coinPriceModel);

@@ -1,4 +1,3 @@
-// Controller: DeviationController.ts
 import { Request, Response } from 'express';
 import { calculateDeviation } from '../services/deviationService';
 
